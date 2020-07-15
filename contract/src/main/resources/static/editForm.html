@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+<link rel="stylesheet" href="layui/css/layui.css" media="all" />
+<script type="text/javascript" src="layui/layui.js"></script>
+<script type="text/javascript" src="info.js"></script>
+<title>修改合同</title>
+</head>
+<body>
+
+	<form id="editForm" class="layui-form" lay-filter="editForm" action="">
+		<div class="layui-form-item">
+			<label class="layui-form-label">合同号ID</label>
+			<div class="layui-input-inline">
+				<input id="id" value='' type="text" name="id" autocomplete="off"
+					placeholder="请输入合同号ID" class="layui-input">
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<div class="layui-inline">
+				<label class="layui-form-label">创建日期</label>
+				<div class="layui-input-inline">
+					<input id="date" type="text" name="date" autocomplete="off"
+						placeholder="yyyy" class="layui-input">
+				</div>
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">流借字</label>
+			<div class="layui-input-inline">
+				<input id="zi" type="text" name="zi" autocomplete="off"
+					placeholder="请输入合同流借字" class="layui-input">
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">借款金额</label>
+			<div class="layui-input-inline">
+				<input id="debt" type="text" name="debt" autocomplete="off"
+					placeholder="请输入借款金额" class="layui-input">
+			</div>
+			<label class="layui-form-label">币种</label>
+			<div class="layui-input-inline">
+				<select id="currency" ></select>
+
+
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<div class="layui-inline">
+				<label class="layui-form-label">借款起始日</label>
+				<div class="layui-input-inline">
+					<input id="startDay" type="text" name="startDay" autocomplete="off"
+						placeholder="yyyy-MM-dd" class="layui-input">
+				</div>
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<div class="layui-inline">
+				<label class="layui-form-label">借款终止日</label>
+				<div class="layui-input-inline">
+					<input type="text" id="endDay" name="endDay" autocomplete="off"
+						placeholder="yyyy-MM-dd" class="layui-input">
+				</div>
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button type="submit" class="layui-btn" lay-submit=""
+					lay-filter="infoSub">提交</button>
+				<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+			</div>
+		</div>
+
+		<script>
+    layui.use(['form','layer'],function(){
+    	var form = layui.form
+    	  ,layer = layui.layer;
+    	 var id=parent.$("#p").val();
+    var url = "http://localhost:8008/info/getById?id=" + id;
+    $.get(url, function (data) {
+        if (data.code == 0) {
+            $('#id').val(data.data.id);
+            $('#date').val(data.data.date);
+            $('#zi').val(data.data.zi);
+            $('#debt').val(data.data.debt);
+            $('#currency').val(data.data.currency);
+            $('#startDay').val(data.data.startDay);
+            $('#endDay').val(data.data.endDay);
+        } else {
+            alert(data.msg)
+        }
+        layui.use('laydate', function(){
+        	  var laydate1 = layui.laydate;
+        	  
+        	  //执行一个laydate实例
+        	  laydate1.render({
+        	    elem: '#date' //指定元素
+        	   ,type: 'year'
+        	   ,trigger: 'click'
+        	  });
+        	  
+        	  var laydate2 = layui.laydate;
+        	  
+        	  laydate2.render({
+        		  elem: '#startDay'
+        		 ,type: 'date'
+        		 ,trigger: 'click'
+        	  });
+        	  
+        	  var laydate3 =layui.laydate;
+        	  
+        	  laydate3.render({
+        		  elem: '#endDay'
+        		 ,type: 'date'
+        	     ,trigger: 'click'
+        	  })
+        	});
+        var url="http://localhost:8008/info/getAllCurr";
+        $.get(url, function (data) {
+            if (data.code == 0) {
+                for (var i = 0; i < data.data.length; i++) {
+                       var newRow = "<option value=" + data.data[i].c_id + ">" + data.data[i].c_name + "</option>";
+                    $("#currency").append(newRow);
+                }
+                form.render();
+            }
+        });
+    });
+   
+    //提交
+    form.on('submit(infoSub)', function(data){
+    	  var data = form.val('editForm');
+    	  var c=$("#currency").val();
+    	 var url = "http://localhost:8008/info/editInfo?id=" + id + "&date=" + data.date + "&zi=" + data.zi + "&debt=" + data.debt + "&currency=" + c + "&startDay=" + data.startDay+ "&endDay=" + data.endDay		 
+         $.get(url, function (data) {
+             if (data.code == 1) {
+            	 window.parent.location.reload();
+            	 layui.use('table', function(){
+            		 var table2 = layui.table;
+       			  table2.render({
+       			    elem: '#InfoList'
+       			    ,height: 312
+       			    ,width: 1050
+       			    ,url: url
+       			    ,page: false //未开启分页
+       			    ,cols: [[ //表头
+       			       {field: 'id', title: 'ID', sort: true}
+       			      ,{field: 'date', title: '创建时间'}
+       			      ,{field: 'zi', title: '流借字'} 
+       			      ,{field: 'debt', title: '借款金额'}
+       			      ,{field: 'currency',title: '币种'}
+       			      ,{field: 'startDay', title: '借款起始日'}
+       			      ,{field: 'endDay', title: '借款终止日'}
+       			    ]]
+       			  });
+            	 });
+            
+             } else {
+                 alert(data.msg);
+             }
+         });
+      return false;
+    });
+  
+    });
+    
+    
+    
+  
+</script>
+	</form>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+<link rel="stylesheet" href="layui/css/layui.css" media="all" />
+<script type="text/javascript" src="layui/layui.js"></script>
+<script type="text/javascript" src="info.js"></script>
+<title>合同管理系统</title>
+</head>
+<body>
+
+	<div class="layui-side layui-bg-black">
+		<div class="layui-side-scroll">
+			<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+			<ul class="layui-nav layui-nav-tree" lay-filter="test">
+				<li class="layui-nav-item layui-nav-itemed"><a class=""
+					href="javascript:;">合同</a>
+					<dl class="layui-nav-child">
+						<dd>
+							<a href="javascript:;">流动资金借款合同</a>
+						</dd>
+					</dl></li>
+			</ul>
+		</div>
+	</div>
+	<input type="hidden" size="30" id="p" value="" />
+	<div class="layui-body">
+		<div class="layui-container" style="height: 100%">
+			<div class="layui-body-header">
+				<span class="layui-body-header-title">流动资金借款合同</span>
+			</div>
+			<div class="layui-row layui-col-space10">
+				<div class="layui-col-md9">
+					<div class="layui-row grid-demo">
+						<form class="layui-form" action="post">
+							<div class="layui-col-md6">
+								<label class="layui-form-label">合同号</label>
+								<div class="layui-input-block">
+									<input id="id" type="text" name="id" required
+										lay-verify="required" placeholder="请输入合同号" autocomplete="off"
+										class="layui-input">
+								</div>
+							</div>
+							<div class="layui-col-md6">
+								<label class="layui-form-label">创建时间</label>
+								<div class="layui-input-block">
+									<input id="date" type="text" name="date" autocomplete="off"
+										placeholder="yyyy" class="layui-input">
+								</div>
+							</div>
+							<script>
+                 layui.use('laydate', function(){
+                           var laydate = layui.laydate;
+  
+                                //执行一个laydate实例
+                     laydate.render({
+                       elem: '#date' //指定元素
+                       ,type: 'year'
+                        ,trigger: 'click'
+                          });
+                        });
+                         </script>
+						</form>
+					</div>
+				</div>
+				<div class="layui-col-md3">
+					<button type="button" class="layui-btn" onclick="getInfo()">
+						<i class="layui-icon">&#xe615;</i>查询
+					</button>
+				</div>
+			</div>
+			<div class="layui-row grid-demo grid-demo-bg1">
+				<!-- 				<script type="text/html" id="toolbarInfo"> -->
+				<div class="layui-btn-container">
+					<button class="layui-btn layui-btn-sm" lay-event="add"
+						onclick="addInfo()">添加</button>
+				</div>
+				<!--         </script> -->
+				<table id="InfoList" class="layui-hide" lay-filter="InfoList"></table>
+				<script type="text/html" id="barInfo">
+          <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+          <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+          <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+               </script>
+				<script>
+					layui.use('table', function() {
+						 var $ = layui.$,
+						 table = layui.table;
+						table.render({
+							elem : '#InfoList',
+							height : 312,
+							width : 1050,
+							toolbar : '#toolbarInfo',
+							totalRow : true,
+							title : '合同信息表',
+							url : 'http://localhost:8008/info/getAll',//数据接口
+							page : false,//未开启分页
+							cols : [ [ //表头
+							{
+								field : 'id',
+								title : 'ID',
+								minWidth : 80,
+								align : 'center',
+								sort : true
+							}, {
+								field : 'date',
+								title : '创建时间',
+								minWidth : 80,
+								align : 'center'
+							}, {
+								field : 'zi',
+								title : '流借字',
+								minWidth : 100,
+								align : 'center'
+							}, {
+								field : 'debt',
+								title : '借款金额',
+								minWidth : 180,
+								align : 'center'
+							},{
+								field : 'currency',
+								title : '币种',
+								minWidth : 100,
+								align : 'center'
+							},{
+								field : 'startDay',
+								title : '借款起始日',
+								minWidth : 180,
+								align : 'center'
+							},{
+								field : 'endDay',
+								title : '借款结束日',
+								minWidth : 180,
+								align : 'center'
+							},{
+								fixed : 'right',
+								align : 'center',
+								minWidth : 180,
+								toolbar : '#barInfo'
+							} ] ]
+                        
+						});
+						 //监听行工具事件
+		                  table.on('tool(InfoList)', function(obj){
+		                      var data = obj.data;
+		                      if(obj.event === 'del'){      //删除
+		                          delById(data.id);
+		         		      } else if(obj.event=='edit'){
+		         		    	editInfo(data.id);
+		         		      }else {     //查看
+		                          alert("查看");
+		                      }
+		                  });
+						 
+		                //删除
+		                  function delById(id){
+		                      layer.confirm('确定删除吗？', function(index) {
+		                      	var url = "http://localhost:8008/info/deleteInfo?id=" + id;
+		                          $.post(url,function (data){
+							               layer.msg('已删除');
+		                             window.location.reload();
+ 		                              layer.close(index); //关闭弹层
+		                          });
+		                      });
+		                  }
+		                
+		                
+		                	});
+		                  //编辑页面
+		                  function editInfo(id){
+		                	  $('#p').val(id);
+		       		         var editDia=layer.open({
+		                          type: 2
+		                          ,title: '修改合同信息'
+		                         ,content: 'editForm.html?id='+id
+		                          ,maxmin: true
+		                          ,area: ['650px', '550px']
+		          		               }); 
+		          		   		       		    
+		                  }
+           			  //增加合同
+           			  function addInfo(){
+           				 var addDia=layer.open({
+           					 type: 2
+	                          ,title: '添加合同信息'
+	                         ,content: 'addForm.html'
+	                          ,maxmin: true
+	                          ,area: ['650px', '550px']
+           				 })
+           			  }
+				
+				</script>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
