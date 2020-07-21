@@ -24,7 +24,7 @@
 			</ul>
 		</div>
 	</div>
-	<input type="hidden" size="30" id="p" value="" />
+	<input type="hidden" size="30" id="p" />
 	<div class="layui-body">
 		<div class="layui-container" style="height: 100%">
 			<div class="layui-body-header">
@@ -37,7 +37,7 @@
 							<div class="layui-col-md6">
 								<label class="layui-form-label">合同号</label>
 								<div class="layui-input-block">
-									<input id="id" type="text" name="id" required
+									<input id="cn" type="text" name="cn" required
 										lay-verify="required" placeholder="请输入合同号" autocomplete="off"
 										class="layui-input">
 								</div>
@@ -49,18 +49,7 @@
 										placeholder="yyyy" class="layui-input">
 								</div>
 							</div>
-							<script>
-                 layui.use('laydate', function(){
-                           var laydate = layui.laydate;
-  
-                                //执行一个laydate实例
-                     laydate.render({
-                       elem: '#date' //指定元素
-                       ,type: 'year'
-                        ,trigger: 'click'
-                          });
-                        });
-                         </script>
+								
 						</form>
 					</div>
 				</div>
@@ -71,12 +60,12 @@
 				</div>
 			</div>
 			<div class="layui-row grid-demo grid-demo-bg1">
-				<!-- 				<script type="text/html" id="toolbarInfo"> -->
+
 				<div class="layui-btn-container">
 					<button class="layui-btn layui-btn-sm" lay-event="add"
 						onclick="addInfo()">添加</button>
 				</div>
-				<!--         </script> -->
+
 				<table id="InfoList" class="layui-hide" lay-filter="InfoList"></table>
 				<script type="text/html" id="barInfo">
           <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
@@ -84,25 +73,35 @@
           <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                </script>
 				<script>
+				layui.use('laydate', function(){
+                    var laydate = layui.laydate;
+
+                         //执行一个laydate实例
+              laydate.render({
+                elem: '#date' //指定元素
+                ,type: 'year'
+                 ,trigger: 'click'
+                   });
+                 });
 					layui.use('table', function() {
 						 var $ = layui.$,
 						 table = layui.table;
 						table.render({
 							elem : '#InfoList',
-							height : 312,
-							width : 1050,
+							height : 500,
+							width : 1060,
 							toolbar : '#toolbarInfo',
 							totalRow : true,
 							title : '合同信息表',
 							url : 'http://localhost:8008/info/getAll',//数据接口
 							page : false,//未开启分页
 							cols : [ [ //表头
-							{
-								field : 'id',
-								title : 'ID',
-								minWidth : 80,
+							 {
+								field : 'cn',
+								title : '合同号',
+								minWidth : 50,
 								align : 'center',
-								sort : true
+								sort:true
 							}, {
 								field : 'date',
 								title : '创建时间',
@@ -111,32 +110,42 @@
 							}, {
 								field : 'zi',
 								title : '流借字',
-								minWidth : 100,
+								minWidth : 50,
 								align : 'center'
 							}, {
 								field : 'debt',
 								title : '借款金额',
-								minWidth : 180,
+								minWidth : 120,
 								align : 'center'
 							},{
 								field : 'currency',
 								title : '币种',
-								minWidth : 100,
+								minWidth : 50,
+								align : 'center'
+							},{
+								field : 'borrower',
+								title : '借款人',
+								minWidth : 80,
+								align : 'center'
+							},{
+								field : 'lender',
+								title : '贷款人',
+								minWidth : 80,
 								align : 'center'
 							},{
 								field : 'startDay',
 								title : '借款起始日',
-								minWidth : 180,
+								minWidth : 120,
 								align : 'center'
 							},{
 								field : 'endDay',
 								title : '借款结束日',
-								minWidth : 180,
+								minWidth : 120,
 								align : 'center'
 							},{
 								fixed : 'right',
 								align : 'center',
-								minWidth : 180,
+								minWidth : 160,
 								toolbar : '#barInfo'
 							} ] ]
                         
@@ -145,18 +154,18 @@
 		                  table.on('tool(InfoList)', function(obj){
 		                      var data = obj.data;
 		                      if(obj.event === 'del'){      //删除
-		                          delById(data.id);
+		                          delById(data.cn);
 		         		      } else if(obj.event=='edit'){
-		         		    	editInfo(data.id);
+		         		    	editInfo(data.cn);
 		         		      }else {     //查看
 		                          alert("查看");
 		                      }
 		                  });
 						 
 		                //删除
-		                  function delById(id){
+		                  function delById(cn){
 		                      layer.confirm('确定删除吗？', function(index) {
-		                      	var url = "http://localhost:8008/info/deleteInfo?id=" + id;
+		                      	var url = "http://localhost:8008/info/deleteInfo?cn=" + cn;
 		                          $.post(url,function (data){
 							               layer.msg('已删除');
 		                             window.location.reload();
@@ -168,16 +177,18 @@
 		                
 		                	});
 		                  //编辑页面
-		                  function editInfo(id){
-		                	  $('#p').val(id);
+		                  function editInfo(cn){
+		                	  $('#p').val(cn);
 		       		         var editDia=layer.open({
 		                          type: 2
 		                          ,title: '修改合同信息'
-		                         ,content: 'editForm.html?id='+id
+		                         ,content: 'editForm.html?cn='+cn
 		                          ,maxmin: true
-		                          ,area: ['650px', '550px']
-		          		               }); 
-		          		   		       		    
+		                          ,area: ['700px', '600px']
+		       		         	  ,success:function(layero,index){
+		       		         		layer.iframeAuto(index)
+		       		         	  }
+		          		          });      		    
 		                  }
            			  //增加合同
            			  function addInfo(){
@@ -186,10 +197,10 @@
 	                          ,title: '添加合同信息'
 	                         ,content: 'addForm.html'
 	                          ,maxmin: true
-	                          ,area: ['650px', '550px']
+	                          ,area: ['700px', '600px']
            				 })
            			  }
-				
+				  
 				</script>
 			</div>
 		</div>

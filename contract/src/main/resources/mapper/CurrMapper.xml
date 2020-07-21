@@ -6,7 +6,7 @@
    select * from currency
  </select>
  <!-- 根据c_id获取币种信息 -->
- <select id="getById" resultType="com.example.demo.model.Info">
+ <select id="getById" resultType="com.example.demo.model.Curr">
   select * from currency where c_id=#{c_id}
  </select>
 </mapper>

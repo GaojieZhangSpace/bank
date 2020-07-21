@@ -7,13 +7,17 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.mapper.InfoMapper;
+import com.example.demo.mapper.PersonMapper;
 import com.example.demo.model.Info;
 
 @Service
 public class InfoService {
 	@Resource
 	InfoMapper infoMapper;
-
+	
+	@Resource
+	PersonMapper personMapper;
+	
 	
 	public List<Info> getAll() {
 		List<Info> list= infoMapper.getAll();
@@ -52,22 +56,48 @@ public class InfoService {
 	}
 	
 	public int addInfo(Info entity) {
-		int code = infoMapper.addInfo(entity);
+		 int code = 0;
+		try {
+			infoMapper.addInfo(entity);
+			personMapper.addPerson(entity.getPerson());
+			
+			
+		} catch (Exception e) {
+		  code=1;
+		}
         return code;
 	}
 	
-	public int deleteInfo(String id) {
-		int code=infoMapper.deleteInfo(id);
+	public int deleteInfo(String cn) {
+		int code=0;
+		try {
+			infoMapper.deleteInfo(cn);
+		} catch (Exception e) {
+			// TODO: handle exception
+			code=1;
+		}
 		return code;
 	}
 	
 	public int editInfo(Info entity) {
-		int code=infoMapper.editInfo(entity);
+		int code=0;
+		try {
+		     infoMapper.editInfo(entity);
+		} catch (Exception e) {
+			// TODO: handle exception
+			code=1;
+		}
 		return code;
 	}
 	
 	public int deleteAll() {
-		int code=infoMapper.deleteAll();
+		int code=0;
+		try {
+			infoMapper.deleteAll();
+		} catch (Exception e) {
+			// TODO: handle exception
+			code=1;
+		}
 		return code;
 	}
 	

@@ -1,38 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.mapper.InfoMapper">
- <!-- 根据主键id获取合同表信息 -->
- <select id="getById" resultType="com.example.demo.model.Info">
-    select * from info where id=#{id}
- </select>
- <!-- 根据合同号cn和创建日期date获取合同表信息 -->
+	<!-- 根据主键id获取合同表以及人员表借款人和放贷人名称 -->
+	<select id="getById" resultType="com.example.demo.model.Info">
+		select info.*,person.* from info
+		join person on info.cn=person.record where info.cn=#{info.cn}
+	</select>
+	<!-- 根据合同号cn和创建日期date获取合同表信息 -->
 	<select id="getInfo" resultType="com.example.demo.model.Info">
-	  select * from info where cn=#{cn} and date=#{date}
+		select
+		info.*,person.borrower,person.lender from info join person on
+		info.cn=person.record where cn=#{cn} and date=#{date}
 	</select>
- <!-- 获取合同表所有信息 -->
+	<!-- 获取合同表所有信息以及相对应的person表中的所有人员身份status及人名sname信息 -->
 	<select id="getAll" resultType="com.example.demo.model.Info">
-	 select * from info
+		select
+		info.*,person.borrower,person.lender from info join person on
+		info.cn=person.record
 	</select>
-	
- <!-- 新增信息到合同表 -->
+
+	<!-- 新增信息到合同表以及人员表 -->
 	<insert id="addInfo">
-	 insert into
-        info(id,cn,date,zi,debt,currency,startDay,endDay)
-        values(#{id},#{cn},#{date},#{zi},#{debt},#{currency},#{startDay},#{endDay}) 
+		insert into info(cn,date,zi,debt,currency,startDay,endDay)values(#{cn},#{date},#{zi},#{debt},#{currency},#{startDay},#{endDay});
 	</insert>
-	
-<!-- 根据合同号删除合同信息 -->
+
+	<!-- 根据选中条目删除合同及对应人员信息 -->
 	<delete id="deleteInfo">
-     delete from info where id=#{id}
+		delete from info where cn=#{cn}
 	</delete>
-	
-<!-- 根据id修改某个指定的合同 -->
+
+	<!-- 根据id修改某个指定的合同及对应人员信息 -->
 	<update id="editInfo">
-	 update info set cn=#{cn},date=#{date},zi=#{zi},debt=#{debt},currency=#{currency},startDay=#{startDay},endDay=#{endDay} where id=#{id}
+		update info join person on cn=#{cn} set date =#{date},zi=#{zi},debt =#{debt},currency=#{currency},startDay=#{startDay},endDay = #{endDay},borrower=#{borrower},lender=#{lender},bPlace=#{bPlace},lPlace=#{lPlace},bTel=#{bTel},lTel=#{lTel},bAgent=#{bAgent},lAgent=#{lAgent},bIsCom=#{bIsCom},lIsCom=#{lIsCom} where cn = record
 	</update>
 
-<!-- 清空合同 -->
-    <delete id="deleteAll">
-      delete from info 
-    </delete>
+	<!-- 清空合同 -->
+	<delete id="deleteAll">
+		delete from info
+	</delete>
 </mapper>
